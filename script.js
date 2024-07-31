@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('Part1.xlsx')
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileName = urlParams.get('file');
+
+    if (!fileName) {
+        alert('No file specified!');
+        return;
+    }
+
+    fetch(fileName)
         .then(response => response.arrayBuffer())
         .then(data => {
             const workbook = XLSX.read(data, { type: 'array' });
