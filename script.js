@@ -121,4 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('showTable').addEventListener('click', () => {
         document.getElementById('completeTable').style.display = 'block';
     });
+
+    document.getElementById('returnHome').addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
 });
