@@ -14,8 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            populateGlossary(json);
-            populateTable(json);
+            const isPracticePage = document.getElementById('practiceSection');
+            if (isPracticePage) {
+                populateGlossary(json);
+            } else {
+                populateTable(json);
+            }
         })
         .catch(error => console.error('Error fetching the Excel file:', error));
 
@@ -24,6 +28,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
+    }
+
+    function populateTable(data) {
+        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+
+        data.forEach((row) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row[1] || '-'}</td>
+                <td>${row[2] || '-'}</td>
+                <td>${row[3] || '-'}</td>
+                <td><a href="${row[4] || '#'}" target="_blank">${row[4] || '-'}</a></td>
+                <td>${row[5] || '-'}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
     }
 
     function populateGlossary(data) {
@@ -101,28 +122,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    function populateTable(data) {
-        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-
-        data.forEach((row) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${row[1] || '-'}</td>
-                <td>${row[2] || '-'}</td>
-                <td>${row[3] || '-'}</td>
-                <td><a href="${row[4] || '#'}" target="_blank">${row[4] || '-'}</a></td>
-                <td>${row[5] || '-'}</td>
-            `;
-            tableBody.appendChild(tr);
+    if (document.getElementById('showTable')) {
+        document.getElementById('showTable').addEventListener('click', () => {
+            const fileName = urlParams.get('file');
+            window.location.href = `table.html?file=${fileName}`;
         });
     }
 
-    document.getElementById('showTable').addEventListener('click', () => {
-        document.getElementById('completeTable').style.display = 'block';
-    });
+    if (document.getElementById('startPractice')) {
+        document.getElementById('startPractice').addEventListener('click', () => {
+            const fileName = urlParams.get('file');
+            window.location.href = `practice.html?file=${fileName}`;
+        });
+    }
 
-    document.getElementById('returnHome').addEventListener('click', () => {
-        window.location.href = 'index.html';
+    const returnHomeButtons = document.querySelectorAll('#returnHome, #returnHome2');
+    returnHomeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
     });
 });
