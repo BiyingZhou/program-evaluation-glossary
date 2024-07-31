@@ -7,6 +7,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    fetch('Parts.xlsx')
+        .then(response => response.arrayBuffer())
+        .then(data => {
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const parts = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            const partInfo = parts.find(part => part[0] + '.xlsx' === fileName);
+            const partTitle = partInfo ? partInfo[1] : 'Program Evaluation';
+
+            document.getElementById('pageTitle').textContent = partTitle;
+        })
+        .catch(error => console.error('Error fetching the Parts.xlsx file:', error));
+
     fetch(fileName)
         .then(response => response.arrayBuffer())
         .then(data => {
@@ -40,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${row[1] || '-'}</td>
                 <td>${row[2] || '-'}</td>
                 <td>${row[3] || '-'}</td>
-                <td><a href="${row[4] || '#'}" target="_blank">${row[4] || '-'}</a></td>
+                <td><a href="${row[4] || '#'}" target="_blank" class="long-link">${row[4] || '-'}</a></td>
                 <td>${row[5] || '-'}</td>
             `;
             tableBody.appendChild(tr);
