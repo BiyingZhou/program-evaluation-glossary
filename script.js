@@ -51,36 +51,34 @@ document.addEventListener('DOMContentLoaded', () => {
         element.classList.add('selected');
 
         if (selectedTerm && selectedDefinition) {
-            matchItems(selectedTerm, selectedDefinition);
+            checkMatch(selectedTerm, selectedDefinition);
         }
     }
 
-    function matchItems(term, definition) {
+    function checkMatch(term, definition) {
         const termIndex = term.dataset.index;
         const definitionIndex = definition.dataset.index;
 
-        term.dataset.match = definitionIndex;
-        definition.dataset.match = termIndex;
+        if (termIndex === definitionIndex) {
+            term.classList.add('correct');
+            definition.classList.add('correct');
+        } else {
+            term.classList.add('incorrect');
+            definition.classList.add('incorrect');
+        }
 
-        term.classList.remove('selected');
-        definition.classList.remove('selected');
-
-        selectedTerm = null;
-        selectedDefinition = null;
-    }
-
-    document.getElementById('checkAnswers').addEventListener('click', () => {
-        let correct = 0;
-        document.querySelectorAll('#termsList li').forEach(term => {
-            const termIndex = term.dataset.index;
-            const matchedIndex = term.dataset.match;
-
-            if (termIndex === matchedIndex) {
-                correct++;
+        setTimeout(() => {
+            term.classList.remove('selected');
+            definition.classList.remove('selected');
+            if (termIndex === definitionIndex) {
+                term.classList.remove('incorrect');
+                definition.classList.remove('incorrect');
+            } else {
+                term.classList.remove('correct');
+                definition.classList.remove('correct');
             }
-        });
-
-        const result = document.getElementById('result');
-        result.textContent = `You got ${correct} out of ${terms.length} correct!`;
-    });
+            selectedTerm = null;
+            selectedDefinition = null;
+        }, 1000);
+    }
 });
