@@ -1,36 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const terms = [
-        "program evaluation", "Program", "Purpose", "Audience", 
-        "Framework", "Approach", "Evaluation Questions", "Data", 
-        "Positive Change", "CES (Canadian Evaluation Society)", "RFP (Request for Proposals)"
-    ];
+    let terms = [];
+    let definitions = [];
 
-    const definitions = [
-        "Evaluation is", "A set of related activities", "The reason for which something", 
-        "The intended group of people", "A structured plan or set of", 
-        "The method or strategy used to", "Specific questions that guide the", 
-        "Information collected for analysis", "Improvements or beneficial", 
-        "A professional association that", "A document issued to solicit"
-    ];
+    document.getElementById('fileInput').addEventListener('change', handleFile, false);
 
-    const termsList = document.getElementById('termsList');
-    const definitionsList = document.getElementById('definitionsList');
+    function handleFile(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const data = new Uint8Array(event.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+            populateGlossary(json);
+        };
+        reader.readAsArrayBuffer(file);
+    }
 
-    terms.forEach((term, index) => {
-        const li = document.createElement('li');
-        li.textContent = term;
-        li.dataset.index = index;
-        li.addEventListener('click', () => selectItem(li, 'term'));
-        termsList.appendChild(li);
-    });
+    function populateGlossary(data) {
+        terms = data.map(row => row[1]);
+        definitions = data.map(row => row[2]);
 
-    definitions.forEach((definition, index) => {
-        const li = document.createElement('li');
-        li.textContent = definition;
-        li.dataset.index = index;
-        li.addEventListener('click', () => selectItem(li, 'definition'));
-        definitionsList.appendChild(li);
-    });
+        const termsList = document.getElementById('termsList');
+        const definitionsList = document.getElementById('definitionsList');
+
+        termsList.innerHTML = '';
+        definitionsList.innerHTML = '';
+
+        terms.forEach((term, index) => {
+            const li = document.createElement('li');
+            li.textContent = term;
+            li.dataset.index = index;
+            li.addEventListener('click', () => selectItem(li, 'term'));
+            termsList.appendChild(li);
+        });
+
+        definitions.forEach((definition, index) => {
+            const li = document.createElement('li');
+            li.textContent = definition;
+            li.dataset.index = index;
+            li.addEventListener('click', () => selectItem(li, 'definition'));
+            definitionsList.appendChild(li);
+        });
+    }
 
     let selectedTerm = null;
     let selectedDefinition = null;
@@ -66,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('checkAnswers').addEventListener('click', () => {
         let correct = 0;
-        termsList.childNodes.forEach(term => {
+        document.querySelectorAll('#termsList li').forEach(term => {
             const termIndex = term.dataset.index;
             const matchedIndex = term.dataset.match;
 
