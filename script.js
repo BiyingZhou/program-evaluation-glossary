@@ -10,9 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error fetching the Excel file:', error));
 
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
     function populateGlossary(data) {
-        const terms = data.map(row => row[1]);
-        const definitions = data.map(row => row[2]);
+        const terms = data.map((row, index) => ({ text: row[1], index }));
+        const definitions = data.map((row, index) => ({ text: row[2], index }));
+
+        shuffleArray(terms);
+        shuffleArray(definitions);
 
         const termsList = document.getElementById('termsList');
         const definitionsList = document.getElementById('definitionsList');
@@ -20,18 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
         termsList.innerHTML = '';
         definitionsList.innerHTML = '';
 
-        terms.forEach((term, index) => {
+        terms.forEach(term => {
             const li = document.createElement('li');
-            li.textContent = term;
-            li.dataset.index = index;
+            li.textContent = term.text;
+            li.dataset.index = term.index;
             li.addEventListener('click', () => selectItem(li, 'term'));
             termsList.appendChild(li);
         });
 
-        definitions.forEach((definition, index) => {
+        definitions.forEach(definition => {
             const li = document.createElement('li');
-            li.textContent = definition;
-            li.dataset.index = index;
+            li.textContent = definition.text;
+            li.dataset.index = definition.index;
             li.addEventListener('click', () => selectItem(li, 'definition'));
             definitionsList.appendChild(li);
         });
