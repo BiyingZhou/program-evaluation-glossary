@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const worksheet = workbook.Sheets[sheetName];
             const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
             populateGlossary(json);
+            populateTable(json);
         })
         .catch(error => console.error('Error fetching the Excel file:', error));
 
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         terms.forEach(term => {
             const li = document.createElement('li');
-            li.textContent = term.text;
+            li.textContent = term.text || '-';
             li.dataset.index = term.index;
             li.addEventListener('click', () => selectItem(li, 'term'));
             termsList.appendChild(li);
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         definitions.forEach(definition => {
             const li = document.createElement('li');
-            li.textContent = definition.text;
+            li.textContent = definition.text || '-';
             li.dataset.index = definition.index;
             li.addEventListener('click', () => selectItem(li, 'definition'));
             definitionsList.appendChild(li);
@@ -99,4 +100,25 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedDefinition = null;
         }, 1000);
     }
+
+    function populateTable(data) {
+        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+
+        data.forEach((row) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row[1] || '-'}</td>
+                <td>${row[2] || '-'}</td>
+                <td>${row[3] || '-'}</td>
+                <td><a href="${row[4] || '#'}" target="_blank">${row[4] || '-'}</a></td>
+                <td>${row[5] || '-'}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    document.getElementById('showTable').addEventListener('click', () => {
+        document.getElementById('completeTable').style.display = 'block';
+    });
 });
