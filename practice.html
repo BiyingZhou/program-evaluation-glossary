@@ -13,23 +13,39 @@
     </header>
     <div class="container">
         <div id="practiceSection">
-            <div class="glossary">
-                <div class="terms">
-                    <h2>Terms</h2>
-                    <ul id="termsList">
-                        <!-- Terms will be populated here -->
-                    </ul>
-                </div>
-                <div class="definitions">
-                    <h2>Definitions</h2>
-                    <ul id="definitionsList">
-                        <!-- Definitions will be populated here -->
-                    </ul>
-                </div>
-            </div>
             <div class="buttons">
-                <button id="showTable">Show Complete Table</button>
+                <button id="showTable">Return Complete Table</button>
+                <button id="nextPractice">Next Practice</button>
                 <button id="returnHome">Return to Home</button>
+            </div>
+            <div class="term">
+                <h2 id="currentTerm">Term</h2>
+            </div>
+            <div class="options">
+                <ul id="optionsList">
+                    <li class="option" id="option1"></li>
+                    <li class="option" id="option2"></li>
+                    <li class="option" id="option3"></li>
+                    <li class="option" id="option4"></li>
+                </ul>
+            </div>
+        </div>
+        <div id="completeTable" style="display: none;">
+            <div class="decorative-border"> 
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Term</th>
+                            <th>Definition</th>
+                            <th>Interpretation</th>
+                            <th>Resource Link</th>
+                            <th>Citation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table content will be populated here -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

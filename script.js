@@ -45,16 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateTable(data) {
-        const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+        const tableBody = document.querySelector('#dataTable tbody');
         tableBody.innerHTML = '';
-
-        data.forEach((row) => {
+    
+        data.forEach(row => {
             const tr = document.createElement('tr');
+            const linkCell = row[4] 
+                ? `<a href="${row[4]}" target="_blank" class="long-link">link</a>` 
+                : '-';
             tr.innerHTML = `
                 <td>${row[1] || '-'}</td>
                 <td>${row[2] || '-'}</td>
                 <td>${row[3] || '-'}</td>
-                <td><a href="${row[4] || '#'}" target="_blank" class="long-link">${row[4] || '-'}</a></td>
+                <td>${linkCell}</td>
                 <td>${row[5] || '-'}</td>
             `;
             tableBody.appendChild(tr);
@@ -64,78 +67,83 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateGlossary(data) {
         const terms = data.map((row, index) => ({ text: row[1], index }));
         const definitions = data.map((row, index) => ({ text: row[2], index }));
-
-        shuffleArray(terms);
-        shuffleArray(definitions);
-
-        const termsList = document.getElementById('termsList');
-        const definitionsList = document.getElementById('definitionsList');
-
-        termsList.innerHTML = '';
-        definitionsList.innerHTML = '';
-
-        terms.forEach(term => {
-            const li = document.createElement('li');
-            li.textContent = term.text || '-';
-            li.dataset.index = term.index;
-            li.addEventListener('click', () => selectItem(li, 'term'));
-            termsList.appendChild(li);
+    
+        const currentTermElement = document.getElementById('currentTerm');
+        const optionsListElement = document.getElementById('optionsList');
+    
+        currentTermElement.innerHTML = '';
+        optionsListElement.innerHTML = '';
+    
+        // Select a term to practice
+        const practiceIndex = Math.floor(Math.random() * terms.length);
+    
+        // Set the selected term
+        const selectedTerm = terms[practiceIndex].text;
+        currentTermElement.textContent = selectedTerm;
+    
+        // Combine the definition of the selected term and three other random definitions
+        const correctDefinition = definitions[practiceIndex];
+        const otherDefinitions = definitions.filter((def, index) => index !== practiceIndex);
+        shuffleArray(otherDefinitions);
+    
+        const options = [
+            correctDefinition,
+            ...otherDefinitions.slice(0, 3)
+        ];
+    
+        // Shuffle the options list
+        shuffleArray(options);
+    
+        // Display the options
+        options.forEach((option, index) => {
+            const optionElement = document.createElement('li');
+            optionElement.className = 'option';
+            optionElement.id = `option${index + 1}`;
+            optionElement.textContent = option.text;
+            console.log(option.index)
+            console.log(data[option.index])
+            optionElement.addEventListener('click', () => handleOptionClick(option.index === practiceIndex, optionElement,  data[option.index]));
+            optionsListElement.appendChild(optionElement);
         });
-
-        definitions.forEach(definition => {
-            const li = document.createElement('li');
-            li.textContent = definition.text || '-';
-            li.dataset.index = definition.index;
-            li.addEventListener('click', () => selectItem(li, 'definition'));
-            definitionsList.appendChild(li);
-        });
     }
-
-    let selectedTerm = null;
-    let selectedDefinition = null;
-
-    function selectItem(element, type) {
-        if (type === 'term') {
-            if (selectedTerm) selectedTerm.classList.remove('selected');
-            selectedTerm = element;
+    
+    // Event handler for option click
+    function handleOptionClick(isCorrect, optionElement, row) {
+        if (isCorrect) {
+            optionElement.style.backgroundColor = '#d4edda';
+            optionElement.style.borderColor = '#c3e6cb';
         } else {
-            if (selectedDefinition) selectedDefinition.classList.remove('selected');
-            selectedDefinition = element;
+            optionElement.style.backgroundColor = '#f8d7da';
+            optionElement.style.borderColor = '#f5c6cb';
         }
-        element.classList.add('selected');
 
-        if (selectedTerm && selectedDefinition) {
-            checkMatch(selectedTerm, selectedDefinition);
+        document.getElementById('completeTable').style.display = 'block';
+        const tableBody = document.querySelector('#dataTable tbody');
+        
+        // Check if the row with the same key (row[1]) already exists
+        const existingRows = Array.from(tableBody.querySelectorAll('tr'));
+        const rowExists = existingRows.some(tr => tr.dataset.key === row[1]);
+
+        if (!rowExists) {
+            const tr = document.createElement('tr');
+            tr.dataset.key = row[1]; // Use row[1] as a unique key for the row
+
+            const colorClass = isCorrect ? 'correct-text' : 'incorrect-text';
+            const linkCell = row[4] 
+                ? `<a href="${row[4]}" target="_blank" class="long-link">link</a>` 
+                : '-';
+            tr.innerHTML = `
+                <td class="${colorClass}">${row[1] || '-'}</td>
+                <td>${row[2] || '-'}</td>
+                <td>${row[3] || '-'}</td>
+                <td>${linkCell}</td>
+                <td>${row[5] || '-'}</td>
+            `;
+            tableBody.appendChild(tr);
         }
     }
 
-    function checkMatch(term, definition) {
-        const termIndex = term.dataset.index;
-        const definitionIndex = definition.dataset.index;
-
-        if (termIndex === definitionIndex) {
-            term.classList.add('correct');
-            definition.classList.add('correct');
-        } else {
-            term.classList.add('incorrect');
-            definition.classList.add('incorrect');
-        }
-
-        setTimeout(() => {
-            term.classList.remove('selected');
-            definition.classList.remove('selected');
-            if (termIndex === definitionIndex) {
-                term.classList.remove('incorrect');
-                definition.classList.remove('incorrect');
-            } else {
-                term.classList.remove('correct');
-                definition.classList.remove('correct');
-            }
-            selectedTerm = null;
-            selectedDefinition = null;
-        }, 1000);
-    }
-
+    
     if (document.getElementById('showTable')) {
         document.getElementById('showTable').addEventListener('click', () => {
             const fileName = urlParams.get('file');
@@ -143,10 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (document.getElementById('nextPractice')) {
+        document.getElementById('nextPractice').addEventListener('click', () => {
+            location.reload();
+        });
+    }
+
     if (document.getElementById('startPractice')) {
         document.getElementById('startPractice').addEventListener('click', () => {
             const fileName = urlParams.get('file');
             window.location.href = `practice.html?file=${fileName}`;
+
         });
     }
 
