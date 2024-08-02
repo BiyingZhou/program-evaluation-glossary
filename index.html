@@ -13,9 +13,8 @@
     </header>
     <div class="container">
         <h2>Select a Part</h2>
-        <ul id="partsList">
-            <!-- Parts will be populated here -->
-        </ul>
+        <div class="buttons" id="partsList">
+        </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -32,12 +31,16 @@
 
                     parts.forEach(part => {
                         const [fileName, description] = part;
-                        const li = document.createElement('li');
-                        const a = document.createElement('a');
+                        const a = document.createElement('button');
                         a.href = `table.html?file=${fileName}.xlsx`;
+                        a.id = 'indexButton'
                         a.textContent = description;
-                        li.appendChild(a);
-                        partsList.appendChild(li);
+
+                        a.addEventListener('click', (event) => {
+                            window.location.href = a.href;
+                            event.preventDefault();
+                        });
+                        partsList.appendChild(a);
                     });
                 })
                 .catch(error => console.error('Error fetching the Excel file:', error));

@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${row[2] || '-'}</td>
                 <td>${row[3] || '-'}</td>
                 <td>${linkCell}</td>
-                <td>${row[5] || '-'}</td>
             `;
             tableBody.appendChild(tr);
         });
@@ -137,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${row[2] || '-'}</td>
                 <td>${row[3] || '-'}</td>
                 <td>${linkCell}</td>
-                <td>${row[5] || '-'}</td>
             `;
             tableBody.appendChild(tr);
         }
